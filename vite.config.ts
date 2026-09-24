@@ -44,12 +44,30 @@ function phoneQr(): Plugin {
   }
 }
 
+/**
+ * transformers.js loads the ONNX runtime WASM from jsDelivr at runtime (and the service worker caches it),
+ * but onnxruntime-web also references a local copy, so Vite emits a ~26 MB .wasm into dist/.
+ * It's never requested, and it exceeds Cloudflare Pages' 25 MiB per-file limit, so drop it.
+ */
+function dropUnusedOnnxWasm(): Plugin {
+  return {
+    name: 'drop-unused-onnx-wasm',
+    apply: 'build',
+    generateBundle(_options, bundle) {
+      for (const file of Object.keys(bundle)) {
+        if (/ort-wasm.*\.wasm$/.test(file)) delete bundle[file]
+      }
+    },
+  }
+}
+
 export default defineConfig({
   plugins: [
     react(),
     tailwindcss(),
     ...(hasMkcert ? [] : [basicSsl()]),
     phoneQr(),
+    dropUnusedOnnxWasm(),
     VitePWA({
       registerType: 'autoUpdate',
       includeAssets: ['icon.svg', 'icons/apple-touch-icon.png'],
@@ -74,13 +92,8 @@ export default defineConfig({
         navigateFallbackDenylist: [/^\/api\//],
         runtimeCaching: [
           {
-            // The ~27 MB ONNX runtime is cached on first use instead of at install time
-            urlPattern: ({ url, sameOrigin }) => sameOrigin && url.pathname.endsWith('.wasm'),
-            handler: 'CacheFirst',
-            options: { cacheName: 'wasm', expiration: { maxEntries: 5 } },
-          },
-          {
-            // ONNX runtime WASM used by transformers.js (the AI models themselves are cached by transformers.js)
+            // ONNX runtime WASM (~26 MB) that transformers.js loads from jsDelivr; cached on first use.
+            // The AI models themselves are cached by transformers.js.
             urlPattern: ({ url }) => url.hostname === 'cdn.jsdelivr.net',
             handler: 'CacheFirst',
             options: { cacheName: 'onnx-runtime', expiration: { maxEntries: 20 }, cacheableResponse: { statuses: [0, 200] } },

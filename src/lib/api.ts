@@ -4,6 +4,8 @@ export interface ServerConfig {
   cloudAvailable: boolean
   provider: string | null
   rigging: boolean
+  /** Share links need the Node backend (not available on static hosting like Cloudflare Pages). */
+  sharing: boolean
 }
 
 export interface JobInfo {
@@ -36,11 +38,16 @@ async function request<T>(path: string, init: RequestInit = {}): Promise<T> {
   return res.json() as Promise<T>
 }
 
+export const NO_BACKEND: ServerConfig = { cloudAvailable: false, provider: null, rigging: false, sharing: false }
+
 export async function getConfig(): Promise<ServerConfig> {
   try {
-    return await request<ServerConfig>('/api/config')
+    const config = await request<Partial<ServerConfig>>('/api/config')
+    return { cloudAvailable: !!config.cloudAvailable, provider: config.provider ?? null, rigging: !!config.rigging, sharing: !!config.sharing }
   } catch {
-    return { cloudAvailable: false, provider: null, rigging: false } // offline → local mode
+    // No backend (static hosting such as Cloudflare Pages, where /api/* may even return index.html) or offline:
+    // everything that runs in the browser still works, in local mode.
+    return NO_BACKEND
   }
 }
 

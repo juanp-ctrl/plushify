@@ -77,7 +77,26 @@ npm run dev:tunnel      # in another — open the printed https://….trycloudfl
 
 The first local-mode run downloads about 70 MB of AI models (the progress bar says so). After that, they're cached and the app works offline. You can install it to your home screen: *Share → Add to Home Screen* on iOS, or *Install app* on Android.
 
-## How it works
+## Deploying to Cloudflare Pages (static, local mode)
+
+Everything in local mode runs in the browser, so the app can be hosted as static files. There's no server, so cloud mode and share links are turned off automatically. The Share button is hidden, and GLB download and video recording still work.
+
+1. In the Cloudflare dashboard, go to **Workers & Pages → Create → Pages → Connect to Git** and pick this repo.
+2. Build settings:
+   - Framework preset: *None* (or *Vite*)
+   - Build command: `npm run build`
+   - Build output directory: `dist`
+   - Environment variable: `NODE_VERSION=22`
+3. Deploy. Every push to `main` redeploys.
+
+Or from the CLI: `npm run build && npx wrangler pages deploy dist --project-name plushify`.
+
+Notes:
+- The ~26 MB ONNX runtime WASM is loaded from jsDelivr at runtime and cached by the service worker. It isn't shipped in `dist/`, which keeps every file under Pages' 25 MiB limit. The AI models download from Hugging Face on first use.
+- Pages serves HTTPS, so the camera works on phones out of the box.
+- To get cloud mode and share links in production, deploy the Hono backend too. Hono runs on Cloudflare Workers/Pages Functions; share storage would move from disk to R2.
+
+
 
 ```
 photo ─► downscale (≤1024px) ─► background removal (RMBG-1.4, Web Worker)

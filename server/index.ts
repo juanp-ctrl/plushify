@@ -24,7 +24,7 @@ app.get('/api/health', (c) => c.json({ ok: true }))
 
 app.get('/api/config', (c) => {
   const provider = getProvider()
-  return c.json({ cloudAvailable: provider !== null, provider: provider?.name ?? null, rigging: provider?.canRig ?? false })
+  return c.json({ cloudAvailable: provider !== null, provider: provider?.name ?? null, rigging: provider?.canRig ?? false, sharing: true })
 })
 
 /** Starts a cloud generation job from an uploaded (cut-out) image. */

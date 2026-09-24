@@ -14,6 +14,7 @@ type Video = { blob: Blob; ext: string; url: string }
 
 export function ExportSheet({ onClose }: { onClose: () => void }) {
   const model = useApp((s) => s.model)
+  const canShareLink = useApp((s) => s.config.sharing)
   const [busy, setBusy] = useState<ProgressInfo | null>(null)
   const [message, setMessage] = useState<{ text: string; error?: boolean } | null>(null)
   const [video, setVideo] = useState<Video | null>(null)
@@ -94,7 +95,7 @@ export function ExportSheet({ onClose }: { onClose: () => void }) {
         ) : (
           <div className="grid grid-cols-2 gap-2">
             <Button variant="secondary" disabled={!!busy} onClick={downloadGlb}>⬇️ Download .glb</Button>
-            <Button variant="secondary" disabled={!!busy} onClick={share}>🔗 Copy share link</Button>
+            {canShareLink && <Button variant="secondary" disabled={!!busy} onClick={share}>🔗 Copy share link</Button>}
             <Button variant="secondary" disabled={!!busy || !canRecord} onClick={() => record(5)}>🎬 Record 5s</Button>
             <Button variant="secondary" disabled={!!busy || !canRecord} onClick={() => record(10)}>🎬 Record 10s</Button>
           </div>
@@ -111,7 +112,11 @@ export function ExportSheet({ onClose }: { onClose: () => void }) {
             )}
           </div>
         )}
-        <p className="pb-2 text-xs text-zinc-500">Share links work for anyone who can reach this server (same Wi-Fi when running locally).</p>
+        <p className="pb-2 text-xs text-zinc-500">
+          {canShareLink
+            ? 'Share links work for anyone who can reach this server (same Wi-Fi when running locally).'
+            : 'Tip: record a video or download the .glb to share your plushie.'}
+        </p>
       </div>
     </div>
   )

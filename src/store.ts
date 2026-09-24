@@ -2,7 +2,7 @@ import { create } from 'zustand'
 import type { LoadedImage } from './lib/image.ts'
 import type { Cutout } from './segmentation/removeBackground.ts'
 import type { GeneratedModel, GenerationMode } from './generation/types.ts'
-import { getConfig, type ServerConfig } from './lib/api.ts'
+import { getConfig, NO_BACKEND, type ServerConfig } from './lib/api.ts'
 
 export type Screen = 'home' | 'camera' | 'review' | 'generating' | 'viewer' | 'gallery' | 'shared'
 
@@ -33,7 +33,7 @@ export const useApp = create<AppState>((set, get) => ({
   model: null,
   mode: 'local',
   bgColor: '#2a1f33',
-  config: { cloudAvailable: false, provider: null, rigging: false },
+  config: NO_BACKEND,
   loadConfig: async () => {
     const config = await getConfig()
     set({ config, mode: config.cloudAvailable ? 'cloud' : 'local' })
