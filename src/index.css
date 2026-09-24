@@ -1,0 +1,38 @@
+@import "tailwindcss";
+
+/* Plushify theme: warm plum neutrals + a soft rounded font (SF Pro Rounded on Apple devices) */
+@theme {
+  --font-sans: ui-rounded, "SF Pro Rounded", "Nunito", "Varela Round", system-ui, sans-serif;
+  --color-zinc-100: #fbf3f7;
+  --color-zinc-200: #f0e2ea;
+  --color-zinc-300: #dcc7d4;
+  --color-zinc-400: #b79fb0;
+  --color-zinc-500: #8f7789;
+  --color-zinc-600: #6a5466;
+  --color-zinc-700: #4a3a4a;
+  --color-zinc-800: #352838;
+  --color-zinc-900: #261c29;
+  --color-zinc-950: #1a1320;
+}
+
+html, body, #root { height: 100%; }
+body { overscroll-behavior: none; -webkit-tap-highlight-color: transparent; }
+
+.checkerboard {
+  background-color: #2d2230;
+  background-image:
+    linear-gradient(45deg, #3b2d3e 25%, transparent 25%),
+    linear-gradient(-45deg, #3b2d3e 25%, transparent 25%),
+    linear-gradient(45deg, transparent 75%, #3b2d3e 75%),
+    linear-gradient(-45deg, transparent 75%, #3b2d3e 75%);
+  background-size: 20px 20px;
+  background-position: 0 0, 0 10px, 10px -10px, -10px 0;
+}
+
+.safe-top { padding-top: max(1rem, env(safe-area-inset-top)); }
+.safe-bottom { padding-bottom: max(1rem, env(safe-area-inset-bottom)); }
+
+@keyframes indeterminate {
+  0% { transform: translateX(-100%); }
+  100% { transform: translateX(300%); }
+}

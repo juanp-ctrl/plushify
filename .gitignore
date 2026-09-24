@@ -1,0 +1,10 @@
+node_modules
+dist
+.env
+certs/*.pem
+server/data
+.DS_Store
+.scratch
+# personal photos used for local testing
+test-assets/toy.jpg
+test-assets/flower.jpg
